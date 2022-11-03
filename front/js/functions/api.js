@@ -1,28 +1,18 @@
 const baseUrl = "http://localhost:3000/api/products/"
 
-export function getAllProducts(){
+export async function getAllProducts(){
+    let products = await fetch('http://localhost:3000/api/products/')
+    .then((response) => response.json());
+ 
+    return products;
+}
+export async function getProduct(id){
+
     //recupérer les produits
+    let result = await getProducts()
+    .then( (product) => {
+        for (let i=0; i < product.length; i++) {
 
-    return products
-}
-export function getProduct(){
-
-    //recupérer les produits
-
-    return products
-}
-
-async function getAllProducts(){
-    let products = await fetch('http://localhost:3000/api/products/');
-    console.log("Produits récupérés !")
-    return products.json();
-}
-
-async function getProduct(){
-    let result = await getProduct()
-    .then( (products) => {
-        for (let i=0; i < products.length; i++) {
-            
             //insertion élement "a"
             let productLink = document.createElement("a");
             document.querySelector("items").appendChild(productLink);
@@ -35,20 +25,20 @@ async function getProduct(){
             //insertion de l'image
             let productImg = document.createElement("img");
             productArticle.appendChild(productImg);
-            productImg.src = products[i].imageUrl;
-            productImg.alt = products[i].altTxt;
+            productImg.src = product[i].imageUrl;
+            productImg.alt = product[i].altTxt;
 
             //insertion titre "h3"
             let productName = document.createElement("h3");
             productArticle.appendChild(productName);
             productName.classList.add("productName");
-            productName.innerHTML = products[i].name;
+            productName.innerHTML = product[i].name;
 
             //insertion description "p"
             let productDescription = document.createElement("p");
             productArticle.appendChild(productName);
             productDescription.classList.add("productName");
-            productDescription.innerHTML = products[i].description;
+            productDescription.innerHTML = product[i].description;
         }
     });
     console.log("Produits crées !")
