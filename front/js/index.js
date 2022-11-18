@@ -1,4 +1,4 @@
-import  { getAllProducts }  from  "./functions/api.js";
+import { getAllProducts }  from  "./functions/api.js";
 
 // aller chercher la liste des canapes via l'api
 async function displayProducts(){
