@@ -8,3 +8,6 @@ export function getCart(){
 export function setCart(cart){
     localStorage.setItem(cartName, JSON.stringify(cart))
 }
+export function deleteItem(){
+    localStorage.removeItem(cart)
+}

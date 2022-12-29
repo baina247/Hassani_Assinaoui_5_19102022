@@ -12,3 +12,20 @@ export async function getProduct(id){
       
     return product
 }
+
+export async function sendForm(data){
+    //envoyer les données an method POST
+  return  await fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        headers: { 
+        Accept: "application/json", 
+        "Content-Type": "application/json", 
+        },
+        body: JSON.stringify(data)
+})
+.then(result => result.json)
+.then((data) => {
+    // envoyé à la page confirmation"
+    window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
+})
+}

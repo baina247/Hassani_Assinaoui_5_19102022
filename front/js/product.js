@@ -1,5 +1,6 @@
 import { getProduct } from "./functions/api.js";
 import { getCart, setCart } from "./functions/localstorage.js";
+
 //récupération de l'id
 const productId =  new URL(window.location.href).searchParams.get("id");
 
@@ -35,7 +36,7 @@ async function displayProduct(id) {
          
 }
 
-// Ajouté un article au panier
+// Ajout d'un produit au panier
 let addToCartBtn = document.getElementById("addToCart");
 addToCartBtn.addEventListener("click", addToCart);
 
@@ -56,7 +57,7 @@ function addToCart() {
                 //si elle n'existe pas, on crée cette couleur avec sa quantité
                 cart[productId][colorChoice] = quantityChoice
             }
-        }//le canapé n'existe pas dans le panier
+        }//le produit n'existe pas dans le panier
         else{
 
             cart[productId] = {
@@ -71,21 +72,3 @@ function addToCart() {
         alert ("Veuillez renseigner tous les champs !")
     }
 }
-
-/**
- * 
-cart = {
-    1432432 : {
-        "red": 3 + 2 
-        "blue": 2
-    },
-    2343242:{
-        "green":2
-    }
-}
-
-
-
-
-
- */
