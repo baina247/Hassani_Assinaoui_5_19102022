@@ -9,5 +9,5 @@ export function setCart(cart){
     localStorage.setItem(cartName, JSON.stringify(cart))
 }
 export function deleteItem(){
-    localStorage.removeItem(cart)
+    localStorage.removeItem(cartName)
 }

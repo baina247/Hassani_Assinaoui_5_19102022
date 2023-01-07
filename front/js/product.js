@@ -45,7 +45,7 @@ function addToCart() {
     const colorChoice = document.querySelector("#colors").value;
     const quantityChoice = parseInt(document.querySelector("#quantity").value);
 
-    if (quantityChoice > 0 && quantityChoice <=100 && quantityChoice != 0 && colorChoice != 0) { 
+    if (quantityChoice > 0 && quantityChoice <= 100 && quantityChoice != 0 && colorChoice != 0) { 
         let cart = getCart()
         //on verifie si le produit existe dans le panier
         if( productId in cart){

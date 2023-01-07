@@ -23,9 +23,5 @@ export async function sendForm(data){
         },
         body: JSON.stringify(data)
 })
-.then(result => result.json)
-.then((data) => {
-    // envoyé à la page confirmation"
-    window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
-})
+.then(result => result.json())
 }

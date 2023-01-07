@@ -1,12 +1,12 @@
 import { getProduct, sendForm } from "./functions/api.js";
-import {getCart} from "./functions/localstorage.js"
+import {getCart, deleteItem, setCart} from "./functions/localstorage.js"
 
 //récupération de l'article
 initDisplayCart();
 
 async function initDisplayCart() {
     let localStorageProduct = await  getCart()
-    if (!localStorageProduct) {
+    if ( Object.keys(localStorageProduct).length === 0) {
 
         const cartTitle= document.querySelector("h1");
         const cartSection = document.querySelector(".cart");
@@ -76,7 +76,7 @@ async function initDisplayCart() {
             // Insertion du prix
             let productPrice = document.createElement("p");
             productItemContentTitlePrice.appendChild(productPrice);
-            productPrice.innerHTML = (canapInfo.price * quantity) + "€";
+            productPrice.innerHTML = canapInfo.price  + "€";
     
             // Insertion de l'élément "div"
             let productItemContentSettings = document.createElement("div");
@@ -102,6 +102,33 @@ async function initDisplayCart() {
             productQuantity.setAttribute("min", "1");
             productQuantity.setAttribute("max", "100");
             productQuantity.setAttribute("name", "itemQuantity");
+            productQuantity.addEventListener("change", async (e) => {
+
+                //on va rechercher l'id de l'article à modifier
+                const idToModify = e.currentTarget.closest('article').dataset.id
+                //on va rechercher la couleur de l'article à modifier
+                const colorToModify = e.currentTarget.closest('article').dataset.color
+                //valeur de la nouvelle quantité
+                let newQuantity =  parseInt(e.target.value)
+                console.log(newQuantity)
+                if(newQuantity < 1 ){
+                    newQuantity = 1
+                    e.currentTarget.value = 1
+                }
+                if(newQuantity > 100 ){
+                    newQuantity = 100
+                    e.currentTarget.value = 100
+                }
+                //contenue du panier
+                const cart = await  getCart()
+                cart[idToModify][colorToModify] = newQuantity
+                setCart(cart)
+                
+
+               
+                //actualisation des données après changement
+                calculTotal()
+            })
     
             // Insertion de l'élément "div"
             let productItemContentSettingsRemove = document.createElement("div");
@@ -113,28 +140,29 @@ async function initDisplayCart() {
             productItemContentSettingsRemove.appendChild(productDeleted);
             productDeleted.className = "deleteItem";
             productDeleted.innerHTML = "Supprimer";
-            productDeleted.addEventListener("click", (e) => {
+            productDeleted.addEventListener("click", async (e) => {
                 e.preventDefault;
-                //supprimer l'element du panier
+                //on va rechercher l'id de l'article à supprimer
+                const idToDelete = e.currentTarget.closest('article').dataset.id
+                //on va rechercher la couleur de l'article à supprimer
+                const colorToDelete = e.currentTarget.closest('article').dataset.color
+                const cart = await  getCart()
                 
-                // supprimer la ligne dans le html
-                
+                //supprimer l'element du panier et la ligne dans le html
+                delete cart[idToDelete][colorToDelete]
+                if (Object.keys(cart[idToDelete]).length === 0){
+                    delete cart[idToDelete]
+                }
                 // envoyer les nouvelles données dans le localStorage
-                localStorage.setItem('cart', JSON.stringify(localStorageProduct));               
+                setCart(cart);               
     
                 // avertir de la suppression et recharger la page
                 alert('Votre article a bien été supprimé.');
                 
-                //Si pas de produits dans le local storage on affiche que le panier est vide
-                if (localStorageProduct.length === 0) {
-                    localStorage.clear();
-                }
                 //Rapide rechargement de la page
                 return location.reload();
  
             })
-
-            let localStorageProduct = JSON.parse(localStorage.getItem("cart"));
 
             });
         }
@@ -153,8 +181,8 @@ async function calculTotal(){
     for (const product of cart){
    
        const productId = product[0]
-       const quantities = Object.values( product[1])
-    
+       const quantities = Object.values(product[1])
+        //reduce methode /*https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
         const initialValue = 0;
         const totalQuantity = quantities.reduce(
         (accumulator, currentValue) => accumulator + currentValue,
@@ -176,7 +204,6 @@ async function calculTotal(){
     
     //on va afficher le total en quantité et en prix   
    document.getElementById("totalQuantity").textContent = totalQuantities;
-
    document.getElementById("totalPrice").textContent = totalPrice;
 }
 
@@ -187,7 +214,7 @@ async function calculTotal(){
     //formulaire regex
     const form = document.querySelector(".cart__order__form")
     
-    form.addEventListener("click", async function(event){
+    form.addEventListener("submit", async function(event){
         const firstName = document.querySelector("#firstName").value
         const lastName = document.querySelector("#lastName").value
         const city = document.querySelector("#city").value
@@ -215,13 +242,15 @@ async function calculTotal(){
             //traiter les donners et les envoyer à l'api
             const result = await  sendForm(data)
             //redirection vers la page de redirection avec l'id de la commande
-            if(result.orderId){
-            //vider le panier
-            deletItem()
-            //redirection vers la page confirmation avec l'orderId en parametre d(url)
-            
+            if(result.orderId != null){
+                //vider le panier
+                deleteItem()
+                
+                //redirection vers la page confirmation avec l'orderId en parametre d(url)
+                window.location.href = `/front/html/confirmation.html?confirmation=${result.orderId}`;
+
             }else{
-            alert ("Une erreur s'est produite lors de la commande")
+                alert ("Une erreur s'est produite lors de la commande")
             }
         }
     })
