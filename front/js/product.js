@@ -66,7 +66,7 @@ function addToCart() {
         }
         setCart(cart)
         
-        alert("Le produit est dans votre panier !");  
+        alert("L'article à été ajouté à votre panier !");  
        
     }else{
         alert ("Veuillez renseigner tous les champs !")

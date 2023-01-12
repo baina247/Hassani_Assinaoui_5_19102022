@@ -8,7 +8,7 @@ async function initDisplayCart() {
     let localStorageProduct = await  getCart()
     if ( Object.keys(localStorageProduct).length === 0) {
 
-        const cartTitle= document.querySelector("h1");
+        const cartTitle = document.querySelector("h1");
         const cartSection = document.querySelector(".cart");
     
         cartTitle.innerHTML = "Votre panier est vide !";
@@ -111,6 +111,7 @@ async function initDisplayCart() {
                 //valeur de la nouvelle quantité
                 let newQuantity =  parseInt(e.target.value)
                 console.log(newQuantity)
+                //sécurité sur la quantité de produit mini et maxi autorisé
                 if(newQuantity < 1 ){
                     newQuantity = 1
                     e.currentTarget.value = 1
@@ -121,11 +122,13 @@ async function initDisplayCart() {
                 }
                 //contenue du panier
                 const cart = await  getCart()
-                cart[idToModify][colorToModify] = newQuantity
-                setCart(cart)
-                
 
-               
+                //Nouvelle valeur à actualiser
+                cart[idToModify][colorToModify] = newQuantity
+
+                //actualisation des nouvelles valeurs
+                setCart(cart)
+
                 //actualisation des données après changement
                 calculTotal()
             })
@@ -241,8 +244,10 @@ async function calculTotal(){
 
             //traiter les donners et les envoyer à l'api
             const result = await  sendForm(data)
+
             //redirection vers la page de redirection avec l'id de la commande
             if(result.orderId != null){
+
                 //vider le panier
                 deleteItem()
                 
@@ -250,7 +255,7 @@ async function calculTotal(){
                 window.location.href = `/front/html/confirmation.html?confirmation=${result.orderId}`;
 
             }else{
-                alert ("Une erreur s'est produite lors de la commande")
+                alert ("Une erreur s'est produite lors de l'envoi de votre commande !")
             }
         }
     })

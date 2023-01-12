@@ -14,7 +14,7 @@ export async function getProduct(id){
 }
 
 export async function sendForm(data){
-    //envoyer les données an method POST
+    //envoyer les données en method POST
   return  await fetch("http://localhost:3000/api/products/order", {
         method: "POST",
         headers: { 
