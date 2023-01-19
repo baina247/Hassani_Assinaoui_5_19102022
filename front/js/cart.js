@@ -92,7 +92,7 @@ async function initDisplayCart() {
             let productQty = document.createElement("p");
             productItemContentSettingsQuantity.appendChild(productQty);
             productQty.innerHTML = "Qty : ";
-    
+
             // Insertion de la quantité
             let productQuantity = document.createElement("input");
             productItemContentSettingsQuantity.appendChild(productQuantity);
@@ -111,7 +111,7 @@ async function initDisplayCart() {
                 //valeur de la nouvelle quantité
                 let newQuantity =  parseInt(e.target.value)
                 console.log(newQuantity)
-                //sécurité sur la quantité de produit mini et maxi autorisé
+                //Ajout de conditions de sécurité pour limité la quantité minimum et maximum qu'on puisse entrer.
                 if(newQuantity < 1 ){
                     newQuantity = 1
                     e.currentTarget.value = 1
@@ -142,7 +142,7 @@ async function initDisplayCart() {
             let productDeleted = document.createElement("p");
             productItemContentSettingsRemove.appendChild(productDeleted);
             productDeleted.className = "deleteItem";
-            productDeleted.innerHTML = "Supprimer";
+            productDeleted.textContent = "Supprimer";
             productDeleted.addEventListener("click", async (e) => {
                 e.preventDefault;
                 //on va rechercher l'id de l'article à supprimer
@@ -172,170 +172,154 @@ async function initDisplayCart() {
         calculTotal()
     }
 }
-/**
- * function de calcul de total du panier
- */
-async function calculTotal(){
-    let totalQuantities = 0
-    let totalPrice = 0
-    const cart = Object.entries(getCart())
+//Fonction de calcule du total de produit et du prix
+async function calculTotal() {
+    let totalQuantity = 0;
+    let totalPrice = 0;
+    const cart = getCart();
 
-    //récupérer le panier
-    for (const product of cart){
-   
-       const productId = product[0]
-       const quantities = Object.values(product[1])
-        //reduce methode /*https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-        const initialValue = 0;
-        const totalQuantity = quantities.reduce(
-        (accumulator, currentValue) => accumulator + currentValue,
-        initialValue
-        );
-
-        console.log(totalQuantity)
-
-        const canapInfo = await getProduct(productId)
-        const price = canapInfo.price
-
-            console.log(price)
-
-        totalPrice += price * totalQuantity
-        totalQuantities += totalQuantity
+    //Parcourir les produits du panier
+    for (const productId in cart) {
+        //Obtenir les informations sur le produit 
+        const product = await getProduct(productId);
+        //Parcourir les couleurs des produits dans le panier
+        for (const color in cart[productId]) {
+            //calculer la quantité totale et le prix total du produit
+            totalQuantity += cart[productId][color];
+            totalPrice += cart[productId][color] * product.price;
+        }
     }
-       console.log(totalPrice)
-       console.log(totalQuantities)
-    
-    //on va afficher le total en quantité et en prix   
-   document.getElementById("totalQuantity").textContent = totalQuantities;
-   document.getElementById("totalPrice").textContent = totalPrice;
+    //Mettre à jour la quantité totale et le prix dans l'interface utilisateur
+    document.getElementById("totalQuantity").textContent = totalQuantity;
+    document.getElementById("totalPrice").textContent = totalPrice;
 }
 
 //-----------------------------------------------------------------------------------
 // 4) Formulaire avant validation de la commande
 //-----------------------------------------------------------------------------------
 
-    //formulaire regex
-    const form = document.querySelector(".cart__order__form")
-    
-    form.addEventListener("submit", async function(event){
-        const firstName = document.querySelector("#firstName").value
-        const lastName = document.querySelector("#lastName").value
-        const city = document.querySelector("#city").value
-        const address = document.querySelector("#address").value
-        const email = document.querySelector("#email").value
-        event.preventDefault()
+// Form Validation Regex / Expression régulière de validation de formulaire
+const form = document.querySelector('.cart__order__form');
+const firstNameInput = document.querySelector('#firstName');
+const lastNameInput = document.querySelector('#lastName');
+const cityInput = document.querySelector('#city');
+const addressInput = document.querySelector('#address');
+const emailInput = document.querySelector('#email');
 
-        const cart = await getCart()
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
 
-        if(validFirstName() && validLastName() && validAddress() && validCity() && validEmail()){
-            //récupérer les données du formulaire + la commande
+  const firstName = firstNameInput.value;
+  const lastName = lastNameInput.value;
+  const city = cityInput.value;
+  const address = addressInput.value;
+  const email = emailInput.value;
 
-            // const data =  construction de la data
-            const data = {
-                contact: {
-                    firstName,
-                    lastName,
-                    address,
-                    city,
-                    email,
-                }, 
-                products:Object.keys(cart),
-            };
+  const cart = await getCart();
 
-            //traiter les donners et les envoyer à l'api
-            const result = await  sendForm(data)
-
-            //redirection vers la page de redirection avec l'id de la commande
-            if(result.orderId != null){
-
-                //vider le panier
-                deleteItem()
-                
-                //redirection vers la page confirmation avec l'orderId en parametre d(url)
-                window.location.href = `/front/html/confirmation.html?confirmation=${result.orderId}`;
-
-            }else{
-                alert ("Une erreur s'est produite lors de l'envoi de votre commande !")
-            }
-        }
-    })
-
-    //Expression regulières
-    let regExEmail = new RegExp('^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$');
-    let regExFirstNameLastNameCity = new RegExp("^[a-zA-Z ,.'-]+$");
-    let regExAddress = new RegExp("^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+");
-
-    //validation du prénom
-    const validFirstName = function() {
-        const inputFirstName = document.querySelector("#firstName")
-        let firstNameErrorMsg = inputFirstName.nextElementSibling;
-        let result = true;
-
-        if (regExFirstNameLastNameCity.test(inputFirstName.value)) {
-            firstNameErrorMsg.innerHTML = '';
-        } else {
-            firstNameErrorMsg.innerHTML = 'Veuillez renseigner votre prénom.';
-            result = false
-        }
-        return result
+  if (validFirstName(firstName) && validLastName(lastName) && validAddress(address) && validCity(city) && validEmail(email)) {
+    // Collect form data and order / Collecter les données du formulaire et commander
+    const data = {
+      contact: {
+        firstName,
+        lastName,
+        address,
+        city,
+        email,
+      },
+      products: Object.keys(cart),
     };
 
-    //validation du nom
-    const validLastName = function() {
-        const inputLastName = document.querySelector("#lastName")
-        let lastNameErrorMsg = inputLastName.nextElementSibling;
-        let result = true;
+    // Send data to API / Envoi de donnée dans l'API
+    const result = await sendForm(data);
 
-        if (regExFirstNameLastNameCity.test(inputLastName.value)) {
-            lastNameErrorMsg.innerHTML = '';
-        } else {
-            lastNameErrorMsg.innerHTML = 'Veuillez renseigner votre nom.';
-            result = false
-        }
-        return result
-    };
+    // Redirect to confirmation page with order ID / Rediriger vers la page de confirmation avec l'ID de commande
+    if (result.orderId) {
+      // Clear cart / Vider le panier
+      deleteItem();
+      window.location.href = `/front/html/confirmation.html?confirmation=${result.orderId}`;
+    } else {
+      alert('Une erreur est survenue lors de la soumission de votre commande !');
+    }
+  }
+});
 
-    //validation de l'adresse
-    const validAddress = function() {
-        const inputAddress = document.querySelector("#address")
-        let addressErrorMsg = inputAddress.nextElementSibling;
-        let result = true;
+//Expression regulières
+const regExEmail = /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/;
+const regExFirstNameLastNameCity = /^[a-zA-Z ,.'-]+$/;
+const regExAddress = /^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+/;
 
-        if (regExAddress.test(inputAddress.value)) {
-            addressErrorMsg.innerHTML = '';
-        } else {
-            addressErrorMsg.innerHTML = 'Veuillez renseigner votre adresse.';
-            result =  false
-        }
-        return result
-    };
+//validation du prénom
+const validFirstName = function() {
+    const inputFirstName = document.querySelector("#firstName")
+    let firstNameErrorMsg = inputFirstName.nextElementSibling;
+    let result = true;
 
-    //validation de la ville
-    const validCity = function() {
-        const inputCity =  document.querySelector("#city")
-        let cityErrorMsg = inputCity.nextElementSibling;
-        let result = true;
+    if (regExFirstNameLastNameCity.test(inputFirstName.value)) {
+        firstNameErrorMsg.innerHTML = '';
+    } else {
+        firstNameErrorMsg.innerHTML = 'Veuillez renseigner votre prénom.';
+        result = false
+    }
+    return result
+};
 
-        if (regExFirstNameLastNameCity.test(inputCity.value)) {
-            cityErrorMsg.innerHTML = '';
-        } else {
-            cityErrorMsg.innerHTML = 'Veuillez renseigner votre ville.';
-            result =  false
-        }
-        return result
-    };
+//validation du nom
+const validLastName = function() {
+    const inputLastName = document.querySelector("#lastName")
+    let lastNameErrorMsg = inputLastName.nextElementSibling;
+    let result = true;
 
-    //validation de l'email
-    const validEmail = function() {
-        const inputEmail = document.querySelector("#email")
-        let emailErrorMsg = inputEmail.nextElementSibling;
-        let result = true;
+    if (regExFirstNameLastNameCity.test(inputLastName.value)) {
+        lastNameErrorMsg.innerHTML = '';
+    } else {
+        lastNameErrorMsg.innerHTML = 'Veuillez renseigner votre nom.';
+        result = false
+    }
+    return result
+};
 
-        if (regExEmail.test(inputEmail.value)) {
-            emailErrorMsg.innerHTML = '';
-        } else {
-            emailErrorMsg.innerHTML = 'Veuillez renseigner votre adresse email.';
-            result =  false
-        }
-        return result
-    };
+//validation de l'adresse
+const validAddress = function() {
+    const inputAddress = document.querySelector("#address")
+    let addressErrorMsg = inputAddress.nextElementSibling;
+    let result = true;
+
+    if (regExAddress.test(inputAddress.value)) {
+        addressErrorMsg.innerHTML = '';
+    } else {
+        addressErrorMsg.innerHTML = 'Veuillez renseigner votre adresse.';
+        result =  false
+    }
+    return result
+};
+
+//validation de la ville
+const validCity = function() {
+    const inputCity =  document.querySelector("#city")
+    let cityErrorMsg = inputCity.nextElementSibling;
+    let result = true;
+
+    if (regExFirstNameLastNameCity.test(inputCity.value)) {
+        cityErrorMsg.innerHTML = '';
+    } else {
+        cityErrorMsg.innerHTML = 'Veuillez renseigner votre ville.';
+        result =  false
+    }
+    return result
+};
+
+//validation de l'email
+const validEmail = function() {
+    const inputEmail = document.querySelector("#email")
+    let emailErrorMsg = inputEmail.nextElementSibling;
+    let result = true;
+
+    if (regExEmail.test(inputEmail.value)) {
+        emailErrorMsg.innerHTML = '';
+    } else {
+        emailErrorMsg.innerHTML = 'Veuillez renseigner votre adresse email.';
+        result =  false
+    }
+    return result
+};
