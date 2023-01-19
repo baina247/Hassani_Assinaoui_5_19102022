@@ -45,12 +45,10 @@ async function initDisplayCart() {
             productDivImg.className = "cart__item__img";
     
             // Insertion de l'image
-            // let productImg = document.querySelector(".item__img");
             let img = document.createElement("img");
             img.setAttribute("src", canapInfo.imageUrl);
             img.setAttribute("alt", canapInfo.altTxt); 
             productDivImg.appendChild(img);
-            // productImg.alt = localStorageProduct.altImgProduit;
             
             // Insertion de l'élément "div" pour la description produit
             let productItemContent = document.createElement("div");
@@ -111,7 +109,7 @@ async function initDisplayCart() {
                 //valeur de la nouvelle quantité
                 let newQuantity =  parseInt(e.target.value)
                 console.log(newQuantity)
-                //Ajout de conditions de sécurité pour limité la quantité minimum et maximum qu'on puisse entrer.
+                //Ajout de conditions de sécurité pour limité la quantité minimum et maximum qu'on puisse entrer en étant dans le panier.
                 if(newQuantity < 1 ){
                     newQuantity = 1
                     e.currentTarget.value = 1
