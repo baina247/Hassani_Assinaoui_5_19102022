@@ -21,7 +21,7 @@ function getConfirmationId() {
   if (orderId) {
     orderId.textContent = id;
   } else {
-    console.error("Erreur : élément orderId introuvable sur la page.");
+    console.error("Erreur : L'élément orderId introuvable sur la page.");
   }
   //Message de remerciement a la clientele
   const message = document.createElement("p");
