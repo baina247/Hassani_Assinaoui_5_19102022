@@ -25,7 +25,7 @@ function getConfirmationId() {
   }
   //Message de remerciement a la clientele
   const message = document.createElement("p");
-  message.textContent = "Merci pour votre achat!";
+  message.textContent = "Merci pour votre achat !";
   
   const confirmation = document.querySelector(".confirmation");
   confirmation.appendChild(message);

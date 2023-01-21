@@ -102,11 +102,11 @@ async function initDisplayCart() {
             productQuantity.setAttribute("name", "itemQuantity");
             productQuantity.addEventListener("change", async (e) => {
 
-                //on va rechercher l'id de l'article à modifier
+                //On va rechercher l'id de l'article à modifier
                 const idToModify = e.currentTarget.closest('article').dataset.id
-                //on va rechercher la couleur de l'article à modifier
+                //On va rechercher la couleur de l'article à modifier
                 const colorToModify = e.currentTarget.closest('article').dataset.color
-                //valeur de la nouvelle quantité
+                //Valeur de la nouvelle quantité
                 let newQuantity =  parseInt(e.target.value)
                 console.log(newQuantity)
                 //Ajout de conditions de sécurité pour limité la quantité minimum et maximum qu'on puisse entrer en étant dans le panier.
@@ -118,16 +118,16 @@ async function initDisplayCart() {
                     newQuantity = 100
                     e.currentTarget.value = 100
                 }
-                //contenue du panier
+                //Contenu du panier
                 const cart = await  getCart()
 
                 //Nouvelle valeur à actualiser
                 cart[idToModify][colorToModify] = newQuantity
 
-                //actualisation des nouvelles valeurs
+                //Actualisation des nouvelles valeurs
                 setCart(cart)
 
-                //actualisation des données après changement
+                //Actualisation des données après changement
                 calculTotal()
             })
     
@@ -143,21 +143,21 @@ async function initDisplayCart() {
             productDeleted.textContent = "Supprimer";
             productDeleted.addEventListener("click", async (e) => {
                 e.preventDefault;
-                //on va rechercher l'id de l'article à supprimer
+                //On va rechercher l'id de l'article à supprimer
                 const idToDelete = e.currentTarget.closest('article').dataset.id
-                //on va rechercher la couleur de l'article à supprimer
+                //On va rechercher la couleur de l'article à supprimer
                 const colorToDelete = e.currentTarget.closest('article').dataset.color
                 const cart = await  getCart()
                 
-                //supprimer l'element du panier et la ligne dans le html
+                //Supprimer l'element du panier et la ligne dans le html
                 delete cart[idToDelete][colorToDelete]
                 if (Object.keys(cart[idToDelete]).length === 0){
                     delete cart[idToDelete]
                 }
-                // envoyer les nouvelles données dans le localStorage
+                //Envoyer les nouvelles données dans le localStorage
                 setCart(cart);               
     
-                // avertir de la suppression et recharger la page
+                //Avertir de la suppression et recharger la page
                 alert('Votre article a bien été supprimé.');
                 
                 //Rapide rechargement de la page
@@ -182,7 +182,7 @@ async function calculTotal() {
         const product = await getProduct(productId);
         //Parcourir les couleurs des produits dans le panier
         for (const color in cart[productId]) {
-            //calculer la quantité totale et le prix total du produit
+            //Calculer la quantité totale et le prix total du produit
             totalQuantity += cart[productId][color];
             totalPrice += cart[productId][color] * product.price;
         }
