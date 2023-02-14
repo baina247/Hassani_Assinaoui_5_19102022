@@ -16,6 +16,7 @@ async function displayProducts(){
                 items.appendChild(productLink);
                 let productArticle = document.createElement("article");
                 productLink.href = `product.html?id=${product._id}`
+                
                 productLink.appendChild(productArticle);
                 console.log(productLink)
                 

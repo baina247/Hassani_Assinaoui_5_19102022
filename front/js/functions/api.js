@@ -7,6 +7,7 @@ export async function getAllProducts() {
 
         return products;
 
+        
     } catch (err) {
         console.error("Erreur lors du chargement de l'API pour récupérer les produits:", err);
     }
