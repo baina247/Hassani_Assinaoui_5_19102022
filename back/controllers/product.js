@@ -1,4 +1,4 @@
-const uuid = require('uuid/v1');
+const uuid = require('uuid');
 const Product = require('../models/Product');
 
 exports.getAllProducts = (req, res, next) => {
